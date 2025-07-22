@@ -123,8 +123,8 @@ const Cart = () => {
           <Typography variant="body1">Your cart is empty.</Typography>
           <Box mt={6} textAlign="center">
             <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#d97706', fontSize: 18 }}>
-              Please collect your books from BCU, Halcyon I-2401 between 9AM - 6PM.<br/>
-              You may drop an WA message on 8884560710 prior to pickup for convenience.
+              Click on Checkout to confirm the orders.<br/>
+                  If you are new user, please signup and return to cart for checkout.
             </Typography>
           </Box>
         </>
@@ -163,8 +163,8 @@ const Cart = () => {
           </Box>
           <Box mt={6} textAlign="center">
             <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#d97706', fontSize: 18 }}>
-              Please collect your books from BCU, Halcyon I-2401 between 9AM - 6PM.<br/>
-              You may drop an WA message on 8884560710 prior to pickup for convenience.
+              Click on Checkout to confirm the orders.<br/>
+                  If you are new user, please signup and return to cart for checkout.
             </Typography>
           </Box>
           {/* Login/Signup Prompt Dialog */}
