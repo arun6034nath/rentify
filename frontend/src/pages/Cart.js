@@ -155,8 +155,8 @@ const Cart = () => {
               <Alert onClose={() => setSuccess(false)} severity="success" sx={{ width: '100%' }}>
                 Order placed successfully!<br/>
                 <span style={{ fontWeight: 'bold', color: '#d97706' }}>
-                  Please collect your books from BCU, Halcyon I-2401 between 9AM - 6PM.<br/>
-                  You may drop an WA message on 8884560710 prior to pickup for convenience.
+                  Click on Checkout to confirm the orders.<br/>
+                  If you are new user, please signup and return to cart for checkout.
                 </span>
               </Alert>
             </Snackbar>
