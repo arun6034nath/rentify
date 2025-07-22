@@ -261,7 +261,7 @@ const MyRentals = () => {
                 Total Quantity: {orders.length}
               </Typography>
               <Typography variant="h6" sx={{ fontWeight: 700, color: '#0f3c7b' }}>
-                Total Price (Remaining): ₹{calculateTotalPrice(orders)}
+                Total Price Due: ₹{calculateTotalPrice(orders)}
               </Typography>
             </Box>
           )}
