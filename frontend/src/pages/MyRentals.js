@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import {
   Container, Typography, Box, Grid, Paper, Button, CircularProgress,
-  Dialog, DialogActions, DialogContent, DialogTitle, Select, MenuItem, Alert,
-  Radio, RadioGroup, FormControlLabel
+  Dialog, DialogActions, DialogContent, DialogTitle, Radio, RadioGroup, FormControlLabel, Alert
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
@@ -93,42 +92,7 @@ const MyRentals = () => {
     navigate('/');
   };
 
-  const handleCancel = async (order) => {
-    // 1. Update order status to 'Cancelled'
-    const { error: orderError } = await supabase
-      .from('orders')
-      .update({ status: 'Cancelled' })
-      .eq('id', order.id);
-    if (orderError) {
-      setError('Failed to cancel order.');
-      return;
-    }
-    // 2. Set rented_quantity in inventory to 0 for this listing
-    await supabase
-      .from('inventory')
-      .update({ rented_quantity: 0, available_quantity: 1 })
-      .eq('listing_id', order.listing_id);
-    // 2b. Set available_quantity=1, rented_quantity=0, available=true in listings
-    const updatePayload = { available_quantity: 1, rented_quantity: 0, available: true };
-    console.log('Updating listings for id:', order.listing_id, 'with payload:', updatePayload);
-    const { error: listingsError } = await supabase
-      .from('listings')
-      .update(updatePayload)
-      .eq('id', order.listing_id);
-    if (listingsError) {
-      console.error('Listings update error:', listingsError.message);
-      setError('Listings update error: ' + listingsError.message);
-      return;
-    }
-    // 3. Refresh orders
-    const { data: userData } = await supabase.auth.getUser();
-
-    // Trigger Edge Function to sync listings before refreshing
-    const { error: funcError } = await supabase.functions.invoke('sync-listings');
-    if (funcError) {
-      console.error('Error syncing listings:', funcError.message);
-    }
-
+  const fetchOrders = async (userData) => {
     const { data, error } = await supabase
       .from('orders')
       .select('id, start_date, end_date, frequency, listing_id, listings(title, price_per_week, price_per_month), price, extend_price, amount_paid')

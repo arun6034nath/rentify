@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { AppBar, Toolbar, Typography, Button, Container, Box, Grid, Paper, CircularProgress, Alert, IconButton, MenuItem, Select, FormControl, InputLabel, TextField } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Container, Grid, Card, CardContent, CardActions,
+  Box, IconButton, Badge, TextField, Select, MenuItem, FormControl } from '@mui/material';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
@@ -12,19 +13,17 @@ import DialogContent from '@mui/material/DialogContent';
 import { supabase } from '../supabaseClient';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
-import MenuIcon from '@mui/icons-material/Menu';
 import Menu from '@mui/material/Menu';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useCart } from '../CartContext';
 import { useNavigate } from 'react-router-dom';
 import DialogActions from '@mui/material/DialogActions';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import Badge from '@mui/material/Badge';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Fab from '@mui/material/Fab';
 import Zoom from '@mui/material/Zoom';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 const features = [
   {
@@ -53,7 +52,7 @@ const Home = () => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [viewAll, setViewAll] = useState(false);
+  const [viewAll, setViewAll] = useState(true);
   const [subcategories, setSubcategories] = useState([]);
   const [selectedSubcategory, setSelectedSubcategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
@@ -62,8 +61,6 @@ const Home = () => {
   const [descDialogContent, setDescDialogContent] = useState('');
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const [mobileMenuAnchorEl, setMobileMenuAnchorEl] = useState(null);
-  const isMobileMenuOpen = Boolean(mobileMenuAnchorEl);
   const { addToCart, cart } = useCart();
   const navigate = useNavigate();
   const [cartDialogOpen, setCartDialogOpen] = useState(false);
@@ -77,13 +74,6 @@ const Home = () => {
   const isAdminMenuOpen = Boolean(adminMenuAnchorEl);
   const [contactDialogOpen, setContactDialogOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
-
-  const handleMobileMenuOpen = (event) => {
-    setMobileMenuAnchorEl(event.currentTarget);
-  };
-  const handleMobileMenuClose = () => {
-    setMobileMenuAnchorEl(null);
-  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -139,11 +129,7 @@ const Home = () => {
     const fetchBooks = async () => {
       setLoading(true);
       setError(null);
-      let query = supabase.from('listings').select('*');
-      if (!viewAll) {
-        query = query.limit(12);
-      }
-      const { data, error } = await query;
+      const { data, error } = await supabase.from('listings').select('*');
       if (error) {
         setError('Failed to load featured books.');
         setBooks([]);
@@ -169,7 +155,7 @@ const Home = () => {
     fetchUser();
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [viewAll]);
+  }, []);
 
   // Filter books by selected subcategory and search term
   const filteredBooks = books
@@ -181,19 +167,6 @@ const Home = () => {
 
   // Apply View All/View Less logic
   const displayedBooks = viewAll ? filteredBooks : filteredBooks.slice(0, 12);
-
-  // Handler for Browse Catalog button
-  const handleBrowseCatalog = () => {
-    if (featuredRef.current) {
-      featuredRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  // Handler for search input
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-    setViewAll(true); // Always show all when searching
-  };
 
   // Handler for opening description dialog
   const handleOpenDescDialog = (desc) => {
@@ -228,6 +201,9 @@ const Home = () => {
     });
     setCartDialogOpen(false);
     setCartDialogBook(null);
+    
+    // Scroll to top of the page so user can easily find the cart icon
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const totalQuantity = cart.length;
@@ -361,7 +337,7 @@ const Home = () => {
         <Grid container spacing={4}>
           {displayedBooks.map((book) => (
             <Grid item key={book.id} xs={12} sm={6} md={4}>
-              <Paper elevation={2} sx={{ p: 0, borderRadius: 3, height: isMobile ? 340 : 420, width: isMobile ? '100%' : 320, display: 'flex', flexDirection: 'column', overflow: 'hidden', margin: isMobile ? '0' : '0 auto' }}>
+              <Card elevation={2} sx={{ p: 0, borderRadius: 3, height: isMobile ? 340 : 420, width: isMobile ? '100%' : 320, display: 'flex', flexDirection: 'column', overflow: 'hidden', margin: isMobile ? '0' : '0 auto' }}>
                 {/* Book Image */}
                 {book.image_url ? (
                   <Box sx={{ cursor: 'pointer', width: '100%', height: isMobile ? 120 : 200, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#f5f5f5' }} onClick={() => handleImageClick(book.image_url)}>
@@ -376,7 +352,7 @@ const Home = () => {
                     <MenuBookIcon sx={{ fontSize: isMobile ? 40 : 60, color: '#bdbdbd' }} />
                   </Box>
                 )}
-                <Box sx={{ p: 2, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                <CardContent sx={{ p: 2, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
                   {/* Subcategory and Status Badges */}
                   <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                     <Typography variant="caption" sx={{ background: '#e3eafd', color: '#2563eb', px: 1.5, py: 0.5, borderRadius: 1, fontWeight: 600 }}>
@@ -433,8 +409,8 @@ const Home = () => {
                       </Box>
                     </Button>
                   )}
-                </Box>
-              </Paper>
+                </CardContent>
+              </Card>
             </Grid>
           ))}
         </Grid>
